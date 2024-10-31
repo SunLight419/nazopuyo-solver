@@ -2,6 +2,7 @@ mod constants;
 mod field;
 mod field_naive_bit;
 mod naive_next_puyo;
+mod puyo_hash;
 
 use field::Field;
 use field_naive_bit::FieldNaiveBit;
