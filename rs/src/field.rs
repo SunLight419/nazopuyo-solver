@@ -262,4 +262,23 @@ where
     let t_end = Instant::now();
     let ell = t_end - t_start;
     println!("{:?} {:?}", ell, ell / count as u32);
+
+    use std::io::Write;
+    let filepath = r".\kenny_bench_result.txt";
+    let mut file = std::fs::OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(filepath);
+
+    match file {
+        Ok(mut f) => {
+            let now = chrono::Local::now().format("%Y-%m-%d %H:%M:%S");
+            writeln!(f, "[{}]", now);
+            writeln!(f, "Type of {}",std::any::type_name::<T>());
+            writeln!(f, "{:?} {:?}", ell, ell / count as u32);
+        }
+        _ => {
+            println!("Failed to write kenny bench result in {filepath}");
+        }
+    }
 }

@@ -2,11 +2,13 @@ mod constants;
 mod field;
 mod field_naive_bit;
 mod naive_next_puyo;
+mod nazopuyo_info;
 mod puyo_hash;
 
 use field::Field;
 use field_naive_bit::FieldNaiveBit;
 use naive_next_puyo::NaiveNextPuyo;
+use nazopuyo_info::NazopuyoInfo;
 
 fn main() {
     // field::kenny_bench::<FieldNaiveBit>();
@@ -19,4 +21,6 @@ fn main() {
     let np = NaiveNextPuyo::from_url(&url).unwrap();
     println!("{}", np);
 
+    let info = NazopuyoInfo::from_url(&url).unwrap();
+    println!("{:?}", info);
 }

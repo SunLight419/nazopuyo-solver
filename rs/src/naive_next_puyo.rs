@@ -16,12 +16,12 @@ impl NaiveNextPuyo {
         }
     }
 
-    pub fn from_vec(v: Vec<[u8; 2]>) -> Self {
-        NaiveNextPuyo {
-            len: v.len(),
-            value: v.try_into().unwrap(),
-        }
-    }
+    // pub fn from_vec(v: Vec<[u8; 2]>) -> Self {
+    //     NaiveNextPuyo {
+    //         len: v.len(),
+    //         value: v.try_into().unwrap(),
+    //     }
+    // }
 
     pub fn from_url(url: &String) -> anyhow::Result<NaiveNextPuyo> {
         if !url.contains("?") {
