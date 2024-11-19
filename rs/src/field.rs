@@ -9,6 +9,7 @@ impl ChainInfo {
     pub fn new() -> Self {
         Self { info: 0 }
     }
+
     pub fn is_strict(&self) -> bool {
         self.info & 6 > 0
     }
@@ -56,6 +57,165 @@ pub trait Field {
     fn is_empty(&self) -> bool;
     fn is_alive(&self) -> bool;
     // fn top(&self, x: usize) -> usize;
+    /// 一番上にあるぷよのインデックス
+    fn get_top(&self, x: usize) -> Option<usize> {
+        for i in 0..13 {
+            if self.get(i, x) != 0 {
+                return Some(i);
+            }
+        }
+        None
+    }
+}
+
+pub fn from_url<F: Field>(url: &String) -> Result<F, Box<dyn std::error::Error>> {
+    if !url.contains("?") {
+        let message = format!("{} is an invalid url.", url);
+        return Err(message.into());
+    }
+    let query = url.split("?").skip(1).next().unwrap();
+    let field_url: Vec<_> = query.chars().take_while(|c| *c != '_').collect();
+
+    let mut field = F::new();
+
+    let mut y = 12;
+    let mut x = 4;
+    for c in field_url.into_iter().rev() {
+        // TODO: 数字を直接参照ではなく変数にかませるようにする
+        // というか対応の const を作成する
+        let empty = 0;
+        let ojama = 1;
+        let red = 2;
+        let blue = 3;
+        let green = 4;
+        let yellow = 5;
+        let purple = 6;
+
+        let (left, right) = match c {
+            '0' => (empty, empty),
+            '1' => (empty, red),
+            '2' => (empty, green),
+            '3' => (empty, blue),
+            '4' => (empty, yellow),
+            '5' => (empty, purple),
+            '6' => (empty, ojama),
+            '7' => todo!(),
+            '8' => (red, empty),
+            '9' => (red, red),
+            'a' => (red, green),
+            'b' => (red, blue),
+            'c' => (red, yellow),
+            'd' => (red, purple),
+            'e' => (red, ojama),
+            'f' => todo!(),
+            'g' => (green, empty),
+            'h' => (green, red),
+            'i' => (green, green),
+            'j' => (green, blue),
+            'k' => (green, yellow),
+            'l' => (green, purple),
+            'm' => (green, ojama),
+            'n' => todo!(),
+            'o' => (blue, empty),
+            'p' => (blue, red),
+            'q' => (blue, green),
+            'r' => (blue, blue),
+            's' => (blue, yellow),
+            't' => (blue, purple),
+            'u' => (blue, ojama),
+            'v' => todo!(),
+            'w' => (yellow, empty),
+            'x' => (yellow, red),
+            'y' => (yellow, green),
+            'z' => (yellow, blue),
+            'A' => (yellow, yellow),
+            'B' => (yellow, purple),
+            'C' => (yellow, ojama),
+            'D' => todo!(),
+            'E' => (purple, empty),
+            'F' => (purple, red),
+            'G' => (purple, green),
+            'H' => (purple, blue),
+            'I' => (purple, yellow),
+            'J' => (purple, purple),
+            'K' => (purple, ojama),
+            'L' => todo!(),
+            'M' => (ojama, empty),
+            'N' => (ojama, red),
+            'O' => (ojama, green),
+            'P' => (ojama, blue),
+            'Q' => (ojama, yellow),
+            'R' => (ojama, purple),
+            'S' => (ojama, ojama),
+            'T' => todo!(),
+            _ => todo!(),
+        };
+        field.set(y, x, left);
+        field.set(y, x + 1, right);
+
+        if x >= 2 {
+            x -= 2;
+        } else {
+            x = 4;
+            y -= 1;
+        }
+    }
+    Ok(field)
+}
+
+/// 一番上にあるぷよのインデックス
+/// None => 列が空
+/// ✟伝家の宝刀 人力二分探索✟
+/// TODO ぷよを置ける位置に変更した方がよい？
+pub fn get_top<F: Field>(field: &F, x: usize) -> Option<usize> {
+    if field.get(12, x) == 0 {
+        return None;
+    }
+    if field.get(6, x) != 0 {
+        if field.get(3, x) != 0 {
+            if field.get(1, x) != 0 {
+                if field.get(0, x) != 0 {
+                    return Some(0);
+                } else {
+                    return Some(1);
+                }
+            } else {
+                if field.get(2, x) != 0 {
+                    return Some(2);
+                } else {
+                    return Some(3);
+                }
+            }
+        } else {
+            if field.get(4, x) != 0 {
+                return Some(4);
+            } else if field.get(5, x) != 0 {
+                return Some(5);
+            } else {
+                return Some(6);
+            }
+        }
+    }
+
+    if field.get(9, x) != 0 {
+        if field.get(7, x) != 0 {
+            return Some(7);
+        } else if field.get(8, x) != 0 {
+            return Some(8);
+        } else {
+            return Some(9);
+        }
+    }
+
+    if field.get(10, x) != 0 {
+        return Some(10);
+    }
+
+    if field.get(11, x) != 0 {
+        return Some(11);
+    }
+
+    Some(12)
 }
 
 pub fn chain<F: Field>(field: &mut F) -> u32
@@ -228,7 +388,7 @@ pub fn has_chain<F: Field>(field: &F, chain_info: ChainInfo) -> bool {
 }
 
 #[allow(unused)]
-pub fn kenny_bench<T>()
+pub fn kenny_bench<T>(comment: String)
 where
     T: Field + Clone,
 {
@@ -256,7 +416,8 @@ where
     let t_start = Instant::now();
 
     for f in fields.iter_mut() {
-        field::chain(f);
+        let num = field::chain(f);
+        assert_eq!(num, 19);
     }
 
     let t_end = Instant::now();
@@ -273,8 +434,8 @@ where
     match file {
         Ok(mut f) => {
             let now = chrono::Local::now().format("%Y-%m-%d %H:%M:%S");
-            writeln!(f, "[{}]", now);
-            writeln!(f, "Type of {}",std::any::type_name::<T>());
+            writeln!(f, "[{}] {}", now, comment);
+            writeln!(f, "Type of {}", std::any::type_name::<T>());
             writeln!(f, "{:?} {:?}", ell, ell / count as u32);
         }
         _ => {

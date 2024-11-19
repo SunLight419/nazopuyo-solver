@@ -1,2 +1,5 @@
 [2024-10-31 22:42:42]Type of rust_nazopuyo_solver_v1::field_naive_bit::FieldNaiveBit
 21.9454759s 21.945µs
+[2024-10-31 23:02:40] コメント機能を追加 Windows
+Type of rust_nazopuyo_solver_v1::field_naive_bit::FieldNaiveBit
+22.1260279s 22.126µs

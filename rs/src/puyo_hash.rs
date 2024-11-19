@@ -1,14 +1,17 @@
 use std::u64;
 
 /// ぷよがどこに置かれたかを記憶します
-#[derive(Clone, Copy)]
-struct PuyoHash {
+#[derive(Clone, Copy, Debug, Hash, Eq, PartialEq)]
+pub struct PuyoHash {
     value: u64,
 }
 
 impl PuyoHash {
-    fn insert(self, mut col: usize, color: u8) -> Self {
+    pub fn new() -> Self {
+        Self { value: 0 }
+    }
 
+    pub fn insert(self, mut col: usize, color: u8) -> Self {
         let mut mask = 0b111;
         let mut index = 0;
         let width = 3;
@@ -21,7 +24,8 @@ impl PuyoHash {
         }
 
         let mask = (1 << index) - 1;
-        let value = (self.value & mask) | ((color as u64) << index) | ((self.value & !mask) << width);
+        let value =
+            (self.value & mask) | ((color as u64) << index) | ((self.value & !mask) << width);
         Self { value }
     }
 }

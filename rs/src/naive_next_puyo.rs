@@ -52,10 +52,10 @@ impl NaiveNextPuyo {
             let c = param[2 * i];
             let (left, right) = match c {
                 '0' => (r, r),
-                '2' => (g, g),
-                '4' => (b, b),
-                '6' => (y, y),
-                '8' => (p, p),
+                '2' => (g, r),
+                '4' => (b, r),
+                '6' => (y, r),
+                '8' => (p, r),
                 'c' => (r, g),
                 'e' => (g, g),
                 'g' => (b, g),
